@@ -826,6 +826,19 @@ PyObject* THPFunction_register_hook(THPFunction *self, PyObject *hook)
   END_HANDLE_TH_ERRORS
 }
 
+PyObject* THPFunction_register_pre_hook(THPFunction *self, PyObject *hook)
+{ 
+  HANDLE_TH_ERRORS
+  auto cdata = self->cdata.lock();
+  TORCH_CHECK(cdata,
+    "Legacy autograd function had _register_pre_hook called before the function was "
+    "invoked.  This usage pattern is no longer supported: please call _register_pre_hook "
+    "AFTER calling your function, or port your code to use non-legacy autograd function, see: "
+    "https://pytorch.org/docs/stable/notes/extending.html#extending-torch-autograd")
+  return torch::autograd::registerFunctionPreHook(*cdata, hook);
+  END_HANDLE_TH_ERRORS
+}
+
 static PyObject *unpack_saved_variables(
     THPFunction *self,
     const std::function<PyObject*(const Variable&)>& unpack_fn)
@@ -998,6 +1011,7 @@ static struct PyMethodDef THPFunction_methods[] = {
   {(char*)"_do_backward", (PyCFunction)THPFunction_do_backward, METH_VARARGS, nullptr},
   {(char*)"_register_hook_dict", (PyCFunction)THPFunction__register_hook_dict, METH_O, nullptr},
   {(char*)"register_hook", (PyCFunction)THPFunction_register_hook, METH_O, nullptr},
+  {(char*)"register_pre_hook", (PyCFunction)THPFunction_register_pre_hook, METH_O, nullptr},
   {nullptr}
 };
 
