@@ -761,8 +761,7 @@ class Module:
                         print("Error in registering pre-hook")
                         print("Error: %s" % e)
                         continue
-        return result
-                        
+                    
         if (len(self._backward_hooks) > 0) or (len(_global_backward_hooks) > 0):
             var = result
             while not isinstance(var, torch.Tensor):
