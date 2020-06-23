@@ -749,7 +749,10 @@ class Module:
                 if isinstance(var, dict):
                     var = next((v for v in var.values() if isinstance(v, torch.Tensor)))
                 else:
-                    var = var[0]
+                    if hasattr(var, 'feats'):
+                        var = var.feats
+                    else:
+                        var = var[0]
             grad_fn = var.grad_fn
             if grad_fn is not None:
                 for hook in self._backward_pre_hooks.values():
@@ -768,7 +771,10 @@ class Module:
                 if isinstance(var, dict):
                     var = next((v for v in var.values() if isinstance(v, torch.Tensor)))
                 else:
-                    var = var[0]
+                    if hasattr(var, 'feats'):
+                        var = var.feats
+                    else:
+                        var = var[0]
             grad_fn = var.grad_fn
             if grad_fn is not None:
                 for hook in itertools.chain(
